@@ -15,6 +15,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
 
+  // Handle menu open/close
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -23,6 +24,7 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
+  // Navigate to login page
   const handleLogin = () => {
     handleClose();
     navigate('/login');
@@ -31,6 +33,7 @@ const Navbar = () => {
   return (
     <AppBar position="fixed" color="primary" elevation={2}>
       <Toolbar>
+        {/* App title */}
         <Typography
           variant="h6"
           component={Link}
@@ -39,6 +42,8 @@ const Navbar = () => {
         >
           MovieVerse
         </Typography>
+
+        {/* Navigation buttons */}
         <Tooltip title="Search Movies">
           <IconButton
             color="inherit"
@@ -59,11 +64,15 @@ const Navbar = () => {
             <FavoriteIcon />
           </IconButton>
         </Tooltip>
+
+        {/* Theme toggle */}
         <Tooltip title={darkMode ? 'Toggle Light Mode' : 'Toggle Dark Mode'}>
           <IconButton color="inherit" onClick={handleThemeChange} sx={{ mr: 1 }}>
             {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
           </IconButton>
         </Tooltip>
+
+        {/* Account menu */}
         <Tooltip title="Account">
           <IconButton
             color="inherit"
@@ -93,4 +102,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default Navbar; 

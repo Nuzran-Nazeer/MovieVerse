@@ -182,12 +182,15 @@ const Search = ({ favorites, onToggleFavorite }) => {
         )}
 
         <Divider sx={{ mb: 3 }} />
-        
+
+        {/* Error message */}
         {error && (
           <Typography color="error" sx={{ mb: 2 }}>
             {error}
           </Typography>
         )}
+
+        {/* Loading state */}
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
             <CircularProgress />
@@ -201,6 +204,7 @@ const Search = ({ favorites, onToggleFavorite }) => {
           </Box>
         ) : (
           <>
+            {/* Movie grid */}
             <Grid container spacing={{ xs: 2, sm: 3 }} justifyContent="center">
               {movies.map((movie) => (
                 <Grid item key={movie.id}>

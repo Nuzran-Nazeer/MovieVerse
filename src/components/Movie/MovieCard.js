@@ -11,12 +11,14 @@ const IMAGE_HEIGHT = 320;
 const FALLBACK_IMAGE = 'https://via.placeholder.com/500x750?text=No+Poster';
 
 const MovieCard = ({ movie, isFavorite, onToggleFavorite }) => {
+  // Get movie poster URL or use fallback
   const imageUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
     : FALLBACK_IMAGE;
   const [imgSrc, setImgSrc] = React.useState(imageUrl);
   const theme = useTheme();
 
+  // Handle movie click and store in localStorage for search history
   const handleClick = () => {
     localStorage.setItem('lastSearchedMovie', JSON.stringify(movie));
   };
@@ -40,6 +42,7 @@ const MovieCard = ({ movie, isFavorite, onToggleFavorite }) => {
         background: theme.palette.background.paper,
       }}
     >
+      {/* Movie poster link - navigates to movie details */}
       <Link to={`/movie/${movie.id}`} style={{ textDecoration: 'none', color: 'inherit' }} onClick={handleClick}>
         <Box
           sx={{
@@ -54,7 +57,8 @@ const MovieCard = ({ movie, isFavorite, onToggleFavorite }) => {
             overflow: 'hidden',
           }}
         >
-          {imgSrc === FALLBACK_IMAGE ? (
+          {/* Fallback content when no poster is available */}
+          {!movie.poster_path ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
               <MovieIcon sx={{ fontSize: 64, color: theme.palette.text.disabled, mb: 1 }} />
               <Typography variant="caption" color="text.secondary">No Poster</Typography>
@@ -74,6 +78,8 @@ const MovieCard = ({ movie, isFavorite, onToggleFavorite }) => {
           )}
         </Box>
       </Link>
+
+      {/* Favorite button - toggles movie favorite status */}
       <IconButton
         onClick={(e) => {
           e.preventDefault();
@@ -97,6 +103,8 @@ const MovieCard = ({ movie, isFavorite, onToggleFavorite }) => {
           <FavoriteBorderIcon />
         )}
       </IconButton>
+
+      {/* Movie info section - displays title, year, and rating */}
       <CardContent sx={{ flexGrow: 1, p: 2, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <Typography gutterBottom variant="subtitle1" component="div" noWrap sx={{ fontWeight: 600, mb: 1, color: theme.palette.text.primary }}>
           {movie.title}

@@ -10,16 +10,19 @@ const Favorites = ({ favorites, onToggleFavorite }) => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      {/* Header */}
       <Typography variant="h4" component="h1" gutterBottom>
         Favorite Movies
       </Typography>
 
+      {/* Error message */}
       {error && (
         <Typography color="error" sx={{ mb: 2 }}>
           {error}
         </Typography>
       )}
 
+      {/* Loading state */}
       {loading ? (
         <Typography>Loading...</Typography>
       ) : favoriteMovies.length === 0 ? (
@@ -31,6 +34,7 @@ const Favorites = ({ favorites, onToggleFavorite }) => {
           </Typography>
         </Box>
       ) : (
+        /* Movie grid */
         <Grid container spacing={3}>
           {favoriteMovies.map((movie) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={movie.id}>

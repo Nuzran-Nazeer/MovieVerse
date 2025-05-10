@@ -13,26 +13,26 @@ import {
 import MovieCard from '../components/Movie/MovieCard';
 import { fetchGenres, discoverMovies } from '../services/tmdbApi';
 
-
 const Browse = ({ favorites, onToggleFavorite }) => {
+
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
-
   const [genres, setGenres] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [year, setYear] = useState('');
   const [rating, setRating] = useState('');
-
   const theme = useTheme();
 
+  // Fetch genres
   useEffect(() => {
     fetchGenres().then(setGenres).catch(() => setGenres([]));
   }, []);
 
+  // Fetch movies when filters change
   useEffect(() => {
     const loadMovies = async () => {
       try {
@@ -56,9 +56,9 @@ const Browse = ({ favorites, onToggleFavorite }) => {
       }
     };
     loadMovies();
-    // eslint-disable-next-line
   }, [selectedGenres, year, rating]);
 
+  // Load more movies
   const loadMore = async () => {
     if (loadingMore) return;
     try {
@@ -115,11 +115,15 @@ const Browse = ({ favorites, onToggleFavorite }) => {
             variant="outlined"
           />
         </Box>
+
+        {/* Error message */}
         {error && (
           <Typography color="error" sx={{ mb: 2 }}>
             {error}
           </Typography>
         )}
+
+        {/* Loading state */}
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
             <CircularProgress />
@@ -133,6 +137,7 @@ const Browse = ({ favorites, onToggleFavorite }) => {
           </Box>
         ) : (
           <>
+            {/* Movie grid */}
             <Grid container spacing={{ xs: 2, sm: 3 }} justifyContent="center">
               {movies.map((movie) => (
                 <Grid item key={movie.id}>
@@ -144,6 +149,8 @@ const Browse = ({ favorites, onToggleFavorite }) => {
                 </Grid>
               ))}
             </Grid>
+
+            {/* Load more button */}
             {page < totalPages && (
               <Box display="flex" justifyContent="center" mt={5}>
                 <Button

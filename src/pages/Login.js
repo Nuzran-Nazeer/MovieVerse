@@ -11,12 +11,14 @@ import {
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const Login = () => {
+  // State management
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const theme = useTheme();
 
-  const handleSubmit = (e) => {
+  // Handle form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('This is just a demo login page. No actual login functionality is implemented.');
   };
@@ -56,6 +58,7 @@ const Login = () => {
             </Alert>
           )}
           <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+            {/* Email field */}
             <TextField
               margin="normal"
               required
@@ -68,6 +71,8 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+
+            {/* Password field */}
             <TextField
               margin="normal"
               required
@@ -80,6 +85,8 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+
+            {/* Submit button */}
             <Button
               type="submit"
               fullWidth

@@ -21,6 +21,7 @@ const Home = ({ favorites, onToggleFavorite }) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const theme = useTheme();
 
+  // Fetch trending movies
   useEffect(() => {
     const loadMovies = async () => {
       try {
@@ -39,6 +40,7 @@ const Home = ({ favorites, onToggleFavorite }) => {
     loadMovies();
   }, []);
 
+  // Load more movies
   const loadMore = async () => {
     if (loadingMore) return;
     try {
@@ -58,17 +60,22 @@ const Home = ({ favorites, onToggleFavorite }) => {
   return (
     <Box sx={{ minHeight: '100vh', background: theme.palette.background.default, pb: 6 }}>
       <Container maxWidth="lg" sx={{ mt: 4, pt: { xs: 8, sm: 10 } }}>
+        {/* Header */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <WhatshotIcon color="error" sx={{ mr: 1, fontSize: 32 }} />
           <Typography variant="h5" fontWeight={700} color="text.primary">
             Trending Now
           </Typography>
         </Box>
+
+        {/* Error message */}
         {error && (
           <Typography color="error" sx={{ mb: 2 }}>
             {error}
           </Typography>
         )}
+
+        {/* Loading state */}
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
             <CircularProgress />
@@ -81,6 +88,7 @@ const Home = ({ favorites, onToggleFavorite }) => {
           </Box>
         ) : (
           <>
+            {/* Movie grid */}
             <Grid container spacing={{ xs: 2, sm: 3 }} justifyContent="center">
               {movies.map((movie) => (
                 <Grid item key={movie.id}>
@@ -92,6 +100,8 @@ const Home = ({ favorites, onToggleFavorite }) => {
                 </Grid>
               ))}
             </Grid>
+
+            {/* Load more button */}
             {page < totalPages && (
               <Box display="flex" justifyContent="center" mt={5}>
                 <Button

@@ -30,6 +30,7 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
+  // Save favorites to localStorage when they change
   useEffect(() => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
@@ -38,16 +39,19 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem('isAuthenticated', JSON.stringify(isAuthenticated));
   }, [isAuthenticated]);
 
+  // Handle login
   const handleLogin = (credentials) => {
     if (credentials.username && credentials.password) {
       setIsAuthenticated(true);
     }
   };
 
+  // Handle theme change
   const handleThemeChange = () => {
     setDarkMode(!darkMode);
   };
 
+  // Handle toggle favorite
   const handleToggleFavorite = (movie) => {
     setFavorites((prevFavorites) => {
       const isFavorite = prevFavorites.some((fav) => fav.id === movie.id);

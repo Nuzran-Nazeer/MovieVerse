@@ -6,6 +6,7 @@ const headers = {
   'Content-Type': 'application/json'
 };
 
+// Fetch trending movies
 export const fetchTrendingMovies = async (timeWindow = 'day', page = 1) => {
   try {
     const response = await fetch(`${BASE_URL}/trending/movie/${timeWindow}?page=${page}`, {
@@ -19,6 +20,7 @@ export const fetchTrendingMovies = async (timeWindow = 'day', page = 1) => {
   }
 };
 
+// Search movies
 export const searchMovies = async (query, page = 1, params = {}) => {
   try {
     const url = new URL(`${BASE_URL}/search/movie`);
@@ -37,6 +39,7 @@ export const searchMovies = async (query, page = 1, params = {}) => {
   }
 };
 
+// Get movie details
 export const getMovieDetails = async (movieId) => {
   try {
     const response = await fetch(`${BASE_URL}/movie/${movieId}`, {
@@ -50,6 +53,7 @@ export const getMovieDetails = async (movieId) => {
   }
 };
 
+// Fetch genres
 export const fetchGenres = async () => {
   try {
     const response = await fetch(`${BASE_URL}/genre/movie/list?language=en-US`, { headers });
@@ -61,6 +65,7 @@ export const fetchGenres = async () => {
   }
 };
 
+// Discover movies
 export const discoverMovies = async (params = {}, page = 1) => {
   try {
     const url = new URL(`${BASE_URL}/discover/movie`);
@@ -80,6 +85,7 @@ export const discoverMovies = async (params = {}, page = 1) => {
   }
 };
 
+// Get movie videos
 export const getMovieVideos = async (movieId) => {
   try {
     const response = await fetch(`${BASE_URL}/movie/${movieId}/videos`, {
@@ -93,6 +99,7 @@ export const getMovieVideos = async (movieId) => {
   }
 };
 
+// Get movie credits
 export const getMovieCredits = async (movieId) => {
   try {
     const response = await fetch(`${BASE_URL}/movie/${movieId}/credits`, {
