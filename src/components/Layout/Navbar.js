@@ -1,17 +1,32 @@
-import React from 'react';
-import { AppBar, Toolbar, Typography, IconButton } from '@mui/material';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import SearchIcon from '@mui/icons-material/Search';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CategoryIcon from '@mui/icons-material/Category';
-import Tooltip from '@mui/material/Tooltip';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useAppContext } from '../../context/AppContext';
 
 const Navbar = () => {
   const { darkMode, handleThemeChange } = useAppContext();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogin = () => {
+    handleClose();
+    navigate('/login');
+  };
 
   return (
     <AppBar position="fixed" color="primary" elevation={2}>
@@ -40,18 +55,42 @@ const Navbar = () => {
           </IconButton>
         </Tooltip>
         <Tooltip title="Favorites">
-          <IconButton color="inherit" component={Link} to="/favorites">
+          <IconButton color="inherit" component={Link} to="/favorites" sx={{ mr: 1 }}>
             <FavoriteIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title={darkMode ? 'Toggle Light Mode' : 'Toggle Dark Mode'}>
-          <IconButton color="inherit" onClick={handleThemeChange} sx={{ ml: 1 }}>
+          <IconButton color="inherit" onClick={handleThemeChange} sx={{ mr: 1 }}>
             {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
           </IconButton>
         </Tooltip>
+        <Tooltip title="Account">
+          <IconButton
+            color="inherit"
+            onClick={handleMenu}
+            sx={{ ml: 1 }}
+          >
+            <AccountCircleIcon />
+          </IconButton>
+        </Tooltip>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+        >
+          <MenuItem onClick={handleLogin}>Login</MenuItem>
+        </Menu>
       </Toolbar>
     </AppBar>
   );
 };
 
-export default Navbar; 
+export default Navbar;

@@ -22,7 +22,6 @@ const Browse = ({ favorites, onToggleFavorite }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
 
-  // Filters
   const [genres, setGenres] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [year, setYear] = useState('');

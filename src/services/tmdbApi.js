@@ -78,4 +78,30 @@ export const discoverMovies = async (params = {}, page = 1) => {
     console.error('Error discovering movies:', error);
     throw error;
   }
+};
+
+export const getMovieVideos = async (movieId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/movie/${movieId}/videos`, {
+      headers
+    });
+    const data = await response.json();
+    return data.results;
+  } catch (error) {
+    console.error('Error fetching movie videos:', error);
+    throw error;
+  }
+};
+
+export const getMovieCredits = async (movieId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/movie/${movieId}/credits`, {
+      headers
+    });
+    const data = await response.json();
+    return data.cast;
+  } catch (error) {
+    console.error('Error fetching movie credits:', error);
+    throw error;
+  }
 }; 

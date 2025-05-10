@@ -12,12 +12,12 @@ import {
   useTheme,
   Paper,
   Divider,
-  Autocomplete,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import MovieCard from '../components/Movie/MovieCard';
 import { searchMovies } from '../services/tmdbApi';
 import { useNavigate } from 'react-router-dom';
+import HistoryIcon from '@mui/icons-material/History';
 
 const LANGUAGES = [
   { code: 'en-US', label: 'English' },
@@ -26,7 +26,6 @@ const LANGUAGES = [
   { code: 'de-DE', label: 'German' },
   { code: 'ja-JP', label: 'Japanese' },
   { code: 'ko-KR', label: 'Korean' },
-  // Add more as needed
 ];
 
 const Search = ({ favorites, onToggleFavorite }) => {
@@ -40,46 +39,17 @@ const Search = ({ favorites, onToggleFavorite }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [searched, setSearched] = useState(false);
-  const [lastQueries, setLastQueries] = useState([]);
   const [lastMovie, setLastMovie] = useState(null);
   const theme = useTheme();
   const navigate = useNavigate();
 
-  // Load last searched movies from localStorage on mount
   useEffect(() => {
-    const lastMovies = localStorage.getItem('lastSearchedMovies');
-    if (lastMovies) {
-      setMovies(JSON.parse(lastMovies));
-      setSearched(true);
+    const lastMovie = localStorage.getItem('lastSearchedMovie');
+    if (lastMovie) {
+      setLastMovie(JSON.parse(lastMovie));
     }
   }, []);
 
-  // Load last searched queries from localStorage on mount
-  useEffect(() => {
-    const last = localStorage.getItem('lastSearchedQueries');
-    if (last) {
-      setLastQueries(JSON.parse(last));
-    }
-  }, []);
-
-  // Load last visited movie from localStorage on mount
-  useEffect(() => {
-    const last = localStorage.getItem('lastSearchedMovie');
-    if (last) {
-      setLastMovie(JSON.parse(last));
-    }
-  }, []);
-
-  // Save a new query to localStorage
-  const saveQuery = (query, year, language) => {
-    const newQuery = { query, year, language };
-    let updated = [newQuery, ...lastQueries.filter(q => q.query !== query || q.year !== year || q.language !== language)];
-    if (updated.length > 8) updated = updated.slice(0, 8);
-    setLastQueries(updated);
-    localStorage.setItem('lastSearchedQueries', JSON.stringify(updated));
-  };
-
-  // Save last visited movie to localStorage
   const handleMovieClick = (movie) => {
     localStorage.setItem('lastSearchedMovie', JSON.stringify(movie));
     setLastMovie(movie);
@@ -104,8 +74,6 @@ const Search = ({ favorites, onToggleFavorite }) => {
       setMovies(newMovies);
       setTotalPages(data.total_pages);
       setPage(resetPage ? 1 : page + 1);
-      localStorage.setItem('lastSearchedMovies', JSON.stringify(newMovies));
-      saveQuery(searchQuery, year, language);
     } catch (err) {
       setError('Failed to search movies. Please try again later.');
     } finally {
@@ -128,74 +96,47 @@ const Search = ({ favorites, onToggleFavorite }) => {
       <Container maxWidth="lg" sx={{ mt: 4, pt: { xs: 8, sm: 10 } }}>
         <Paper elevation={0} sx={{ p: { xs: 2, sm: 4 }, mb: 4, borderRadius: 3, background: 'none', boxShadow: 'none', maxWidth: 600, mx: 'auto' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-            <Autocomplete
-              freeSolo
-              options={lastMovie ? [lastMovie] : []}
-              getOptionLabel={option => option.title || ''}
-              openOnFocus
-              disableClearable
-              noOptionsText={lastMovie ? '' : 'No last visited movie'}
-              sx={{ width: '100%', mb: 2 }}
-              renderOption={(props, option) => (
-                <Box component="li" {...props} sx={{ p: 1, display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer' }} onClick={() => handleMovieClick(option)}>
-                  <img
-                    src={option.poster_path ? `https://image.tmdb.org/t/p/w92${option.poster_path}` : 'https://via.placeholder.com/92x138?text=No+Poster'}
-                    alt={option.title}
-                    style={{ width: 46, height: 69, borderRadius: 6, objectFit: 'cover', background: '#222' }}
-                  />
-                  <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>{option.title}</Typography>
-                    <Typography variant="caption" color="text.secondary">{option.release_date ? new Date(option.release_date).getFullYear() : '-'}</Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>★ {option.vote_average ? option.vote_average.toFixed(1) : '-'}</Typography>
-                  </Box>
-                </Box>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  fullWidth
-                  variant="outlined"
-                  placeholder="Search movies..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') handleSearch(true); }}
-                  InputProps={{
-                    ...params.InputProps,
-                    sx: { borderRadius: 999, pr: 0, background: theme.palette.background.default },
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() => handleSearch(true)}
-                          disabled={!searchQuery.trim() || loading}
-                          sx={{
-                            minWidth: 40,
-                            height: 40,
-                            borderRadius: '50%',
-                            boxShadow: 1,
-                            p: 0,
-                            ml: -2,
-                            backgroundColor: theme.palette.primary.main,
-                            color: theme.palette.getContrastText(theme.palette.primary.main),
-                            '&:hover': {
-                              backgroundColor: theme.palette.primary.dark,
-                            },
-                          }}
-                        >
-                          <SearchIcon />
-                        </Button>
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    borderRadius: 999,
-                    background: theme.palette.background.default,
-                    boxShadow: 1,
-                    input: { color: theme.palette.text.primary },
-                  }}
-                />
-              )}
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Search movies..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleSearch(true); }}
+              InputProps={{
+                sx: { borderRadius: 999, pr: 0, background: theme.palette.background.default },
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleSearch(true)}
+                      disabled={!searchQuery.trim() || loading}
+                      sx={{
+                        minWidth: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        boxShadow: 1,
+                        p: 0,
+                        ml: -6,
+                        backgroundColor: theme.palette.primary.main,
+                        color: theme.palette.getContrastText(theme.palette.primary.main),
+                        '&:hover': {
+                          backgroundColor: theme.palette.primary.dark,
+                        },
+                      }}
+                    >
+                      <SearchIcon />
+                    </Button>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                borderRadius: 999,
+                background: theme.palette.background.default,
+                boxShadow: 1,
+                input: { color: theme.palette.text.primary },
+              }}
             />
             <Box sx={{ display: 'flex', gap: 2, width: '100%', justifyContent: 'center', mt: 1 }}>
               <TextField
@@ -221,7 +162,27 @@ const Search = ({ favorites, onToggleFavorite }) => {
             </Box>
           </Box>
         </Paper>
+
+        {/* Last Searched Movie Section */}
+        {lastMovie && !searched && (
+          <Paper sx={{ p: 3, mb: 4, borderRadius: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <HistoryIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
+              <Typography variant="h6">Last Searched Movie</Typography>
+            </Box>
+            <Divider sx={{ mb: 2 }} />
+            <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <MovieCard
+                movie={lastMovie}
+                isFavorite={favorites.some(fav => fav.id === lastMovie.id)}
+                onToggleFavorite={() => onToggleFavorite(lastMovie)}
+              />
+            </Box>
+          </Paper>
+        )}
+
         <Divider sx={{ mb: 3 }} />
+        
         {error && (
           <Typography color="error" sx={{ mb: 2 }}>
             {error}
@@ -252,7 +213,7 @@ const Search = ({ favorites, onToggleFavorite }) => {
                 </Grid>
               ))}
             </Grid>
-            {page < totalPages && movies.length > 0 && (
+            {page < totalPages && (
               <Box display="flex" justifyContent="center" mt={5}>
                 <Button
                   variant="contained"

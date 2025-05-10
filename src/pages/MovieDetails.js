@@ -11,24 +11,39 @@ import {
   CircularProgress,
   Link,
   Divider,
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
 } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import LanguageIcon from '@mui/icons-material/Language';
-import { getMovieDetails } from '../services/tmdbApi';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PersonIcon from '@mui/icons-material/Person';
+import { getMovieDetails, getMovieVideos, getMovieCredits } from '../services/tmdbApi';
 
 const MovieDetails = ({ favorites, onToggleFavorite }) => {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
+  const [videos, setVideos] = useState([]);
+  const [cast, setCast] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showTrailer, setShowTrailer] = useState(false);
 
   useEffect(() => {
-    const fetchMovieDetails = async () => {
+    const fetchMovieData = async () => {
       try {
         setLoading(true);
-        const data = await getMovieDetails(id);
-        setMovie(data);
+        const [movieData, videoData, castData] = await Promise.all([
+          getMovieDetails(id),
+          getMovieVideos(id),
+          getMovieCredits(id)
+        ]);
+        setMovie(movieData);
+        setVideos(videoData);
+        setCast(castData.slice(0, 10)); 
         setError(null);
       } catch (err) {
         setError('Failed to load movie details. Please try again later.');
@@ -37,8 +52,10 @@ const MovieDetails = ({ favorites, onToggleFavorite }) => {
       }
     };
 
-    fetchMovieDetails();
+    fetchMovieData();
   }, [id]);
+
+  const trailer = videos.find(video => video.type === 'Trailer' && video.site === 'YouTube');
 
   if (loading) {
     return (
@@ -74,8 +91,108 @@ const MovieDetails = ({ favorites, onToggleFavorite }) => {
     }).format(amount);
   };
 
+  const renderCastCard = (actor) => {
+    const imageUrl = actor.profile_path
+      ? `https://image.tmdb.org/t/p/w200${actor.profile_path}`
+      : null;
+
+    return (
+      <Card 
+        sx={{ 
+          width: '100%',
+          height: 320,
+          display: 'flex',
+          flexDirection: 'column',
+          transition: 'transform 0.2s',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+          },
+        }}
+      >
+        <Box
+          sx={{
+            height: 240, 
+            position: 'relative',
+            bgcolor: 'grey.200',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+          }}
+        >
+          {imageUrl ? (
+            <CardMedia
+              component="img"
+              image={imageUrl}
+              alt={actor.name}
+              sx={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.querySelector('.placeholder-icon').style.display = 'flex';
+              }}
+            />
+          ) : (
+            <Box
+              className="placeholder-icon"
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                width: '100%',
+                bgcolor: 'grey.200',
+              }}
+            >
+              <PersonIcon sx={{ fontSize: 64, color: 'grey.400', mb: 1 }} />
+              <Typography variant="caption" color="text.secondary">
+                No Image
+              </Typography>
+            </Box>
+          )}
+        </Box>
+        <CardContent 
+          sx={{ 
+            flexGrow: 1,
+            p: 1.5,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            minHeight: 80, 
+          }}
+        >
+          <Typography 
+            variant="subtitle1" 
+            component="div" 
+            noWrap
+            sx={{ 
+              fontWeight: 600,
+              mb: 0.5,
+            }}
+          >
+            {actor.name}
+          </Typography>
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            noWrap
+            sx={{
+              fontSize: '0.875rem',
+            }}
+          >
+            {actor.character}
+          </Typography>
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
-    <Box>
+    <Box sx={{ mt: { xs: 7, sm: 8 } }}>
       <Box
         sx={{
           position: 'relative',
@@ -117,7 +234,7 @@ const MovieDetails = ({ favorites, onToggleFavorite }) => {
             </Grid>
             <Grid item xs={12} md={8}>
               <Box sx={{ color: 'white' }}>
-                <Typography variant="h3" component="h1" gutterBottom>
+                <Typography variant="h3" component="h1" gutterBottom sx={{ mt: { xs: 5, sm: 12 } }}>
                   {movie.title}
                 </Typography>
                 {movie.tagline && (
@@ -155,6 +272,22 @@ const MovieDetails = ({ favorites, onToggleFavorite }) => {
                     )}
                   </IconButton>
                 </Box>
+                {trailer && (
+                  <Button
+                    variant="contained"
+                    startIcon={<PlayArrowIcon />}
+                    onClick={() => setShowTrailer(true)}
+                    sx={{
+                      mb: 2,
+                      backgroundColor: 'red',
+                      '&:hover': {
+                        backgroundColor: 'darkred',
+                      },
+                    }}
+                  >
+                    Watch Trailer
+                  </Button>
+                )}
                 {movie.homepage && (
                   <Link
                     href={movie.homepage}
@@ -177,6 +310,45 @@ const MovieDetails = ({ favorites, onToggleFavorite }) => {
           </Grid>
         </Container>
       </Box>
+      {showTrailer && trailer && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            zIndex: 1300,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 2,
+          }}
+          onClick={() => setShowTrailer(false)}
+        >
+          <Box
+            sx={{
+              width: '100%',
+              maxWidth: '1000px',
+              aspectRatio: '16/9',
+              position: 'relative',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <iframe
+              width="100%"
+              height="100%"
+              src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1`}
+              title="Movie Trailer"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              style={{ borderRadius: '8px' }}
+            />
+          </Box>
+        </Box>
+      )}
       <Container sx={{ mt: 4, mb: 4 }}>
         <Grid container spacing={4}>
           <Grid item xs={12} md={6}>
@@ -297,6 +469,22 @@ const MovieDetails = ({ favorites, onToggleFavorite }) => {
               </Paper>
             </Grid>
           )}
+          {/* Cast Section */}
+          <Grid item xs={12}>
+            <Paper sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Cast
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <Grid container spacing={2}>
+                {cast.map((actor) => (
+                  <Grid item xs={6} sm={4} md={2.4} key={actor.id}>
+                    {renderCastCard(actor)}
+                  </Grid>
+                ))}
+              </Grid>
+            </Paper>
+          </Grid>
         </Grid>
       </Container>
     </Box>

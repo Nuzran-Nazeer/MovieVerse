@@ -10,6 +10,7 @@ import MovieDetails from './pages/MovieDetails';
 import Favorites from './pages/Favorites';
 import Browse from './pages/Browse';
 import Search from './pages/Search';
+import Login from './pages/Login';
 
 const AppContent = () => {
   const { darkMode, favorites, handleThemeChange, handleToggleFavorite } = useAppContext();
@@ -71,6 +72,7 @@ const AppContent = () => {
               />
             }
           />
+          <Route path="/login" element={<Login />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
